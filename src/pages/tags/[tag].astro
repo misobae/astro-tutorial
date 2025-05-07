@@ -1,0 +1,39 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+// getStaticPaths: 정적 사이트 생성(SSG) 기능에서 사용되는 함수
+// 빌드 타임에 생성할 동적 페이지의 경로를 정의함
+export async function getStaticPaths() {
+  const allPosts = Object.values(
+    import.meta.glob("../posts/*.md", { eager: true })
+  );
+
+  return [
+    { params: { tag: "astro" }, props: { posts: allPosts } },
+    { params: { tag: "successes" }, props: { posts: allPosts } },
+    { params: { tag: "community" }, props: { posts: allPosts } },
+    { params: { tag: "blogging" }, props: { posts: allPosts } },
+    { params: { tag: "setbacks" }, props: { posts: allPosts } },
+    { params: { tag: "learning in public" }, props: { posts: allPosts } },
+  ];
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+const filteredPosts = posts.filter((post: any) =>
+  post.frontmatter.tags?.includes(tag)
+);
+---
+
+<Layout pageTitle={tag}>
+  <p>Posts tagged with {tag}</p>
+  <ul>
+    {
+      filteredPosts.map((post: any) => (
+        <li>
+          <a href={post.url}>{post.frontmatter.title}</a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
